@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="https://www.gstatic.com/firebasejs/6.4.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.4.1/firebase-messaging.js"></script>
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyA-cl-Ly_JyTs5QdTOjNKZnYsfZeI0B7SU",
+      authDomain: "pomodoro-lit-codes.firebaseapp.com",
+      databaseURL: "https://pomodoro-lit-codes.firebaseio.com",
+      projectId: "pomodoro-lit-codes",
+      storageBucket: "",
+      messagingSenderId: "373119630380",
+      appId: "1:373119630380:web:25e1146cb81bbb5c"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
+    Notification.requestPermission().then((permission) => {
+      if (permission === 'granted') {
+        console.log('Notification permission granted.');
+        // TODO(developer): Retrieve an Instance ID token for use with FCM.
+        // ...
+      } else {
+        console.log('Unable to get permission to notify.');
+      }
+    });
+    // Get Instance ID token. Initially this makes a network call, once retrieved
+    // subsequent calls to getToken will return from cache.
+    messaging.getToken().then((currentToken) => {
+      if (currentToken) {
+        console.log(currentToken);
+      } else {
+        // Show permission request.
+        console.log('No Instance ID token available. Request permission to generate one.');
+        // Show permission UI.
+      }
+    }).catch((err) => {
+      console.log('An error occurred while retrieving token. ', err);
+    });
+
+    messaging.onMessage((payload) => {
+      console.log('Message received. ', payload);
+      // ...
+    });
+
+  </script>
+</head>
+
+<body>
+</body>
+
+</html>

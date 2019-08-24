@@ -1,0 +1,19 @@
+{
+  "name": "pomodoro",
+  "version": "1.0.0",
+  "description": "It's yet another pomodoro time tracker with the ability to share your time tracking log and alarms amongst many devices (pretty much any device with web support).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lit-codes/pomodoro.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lit-codes/pomodoro/issues"
+  },
+  "homepage": "https://github.com/lit-codes/pomodoro#readme"
+}
