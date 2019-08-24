@@ -1,6 +1,6 @@
 # Pomodoro
 
-Your favorite time tracking technique, available for multiple type of devices, which you can start/stop/configure on one device and have it automatically updated on other devices.
+Your favorite time tracking technique, available for web, which you can start/stop/configure on one device and have it automatically updated on other devices.
 
 ## Usage
 
