@@ -9,25 +9,28 @@ class FirebaseMessaging {
         this.clients = new Set();
     }
 
-    addClient(client) {
-        this.clients.add(client);
+    async send(message, options = {}) {
+        return admin.messaging().send({
+            data: message,
+            ...options,
+        });
     }
 
-    async send(message) {
-        const tokens = Array.from(this.clients);
-
-        const { responses } = await admin.messaging().sendMulticast({
+    async sendToClients(clients, message) {
+        return admin.messaging().sendMulticast({
             data: message,
-            tokens,
+            tokens: clients,
         });
+    }
 
-        responses.forEach((response, i) => {
-            if (response.error) {
-                this.clients.delete(tokens[i]);
-            }
+    async sendToTopic(topic, message) {
+        return admin.messaging().sendToTopic(topic, {
+            data: message,
         });
+    }
 
-        return responses;
+    async subscribeToTopic(topic, client) {
+        return admin.messaging().subscribeToTopic(client, topic);
     }
 }
 
