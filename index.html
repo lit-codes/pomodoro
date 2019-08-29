@@ -51,7 +51,7 @@
     });
 
     function post(path, data) {
-        return fetch(`https://pomodoro.lit.codes/api${path}`, {
+        return fetch(`/api${path}`, {
             method: 'POST',
             cache: 'no-cache',
             headers: {
@@ -63,6 +63,7 @@
 
     function send() {
         post('/', {topic, message});
+        return false;
     }
 
     function generateTopic() {
@@ -72,8 +73,10 @@
 </head>
 
 <body>
-    <input type="text" id="message">
-    <button onclick="send()">send</button>
+    <form onclick="send()">
+        <input type="text" id="message">
+        <button type="submit">send</button>
+    </form>
 </body>
 
 </html>
