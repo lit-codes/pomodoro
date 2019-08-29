@@ -1,5 +1,5 @@
 {
   "env": {
-    "PKEY": "@pkey_secret"
+    "PKEY": "@pkey-secret"
   }
 }
