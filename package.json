@@ -1,19 +1,15 @@
 {
-  "name": "pomodoro",
+  "name": "pomodoro-backend",
   "version": "1.0.0",
-  "description": "It's yet another pomodoro time tracker with the ability to share your time tracking log and alarms amongst many devices (pretty much any device with web support).",
-  "main": "index.js",
+  "description": "",
+  "main": "get_token.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lit-codes/pomodoro.git"
+    "send": "node src/send_notification.js"
   },
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/lit-codes/pomodoro/issues"
-  },
-  "homepage": "https://github.com/lit-codes/pomodoro#readme"
+  "dependencies": {
+    "firebase-admin": "^8.4.0",
+    "googleapis": "^42.0.0"
+  }
 }

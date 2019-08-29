@@ -5,6 +5,11 @@
   <script src="https://www.gstatic.com/firebasejs/6.4.2/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/6.4.1/firebase-messaging.js"></script>
   <script>
+    let topic = document.location.hash.split('#')[1];
+    if (!topic) {
+        topic = generateTopic();
+        document.location.hash = topic;
+    }
     // Your web app's Firebase configuration
     var firebaseConfig = {
       apiKey: "AIzaSyA-cl-Ly_JyTs5QdTOjNKZnYsfZeI0B7SU",
@@ -21,35 +26,54 @@
     Notification.requestPermission().then((permission) => {
       if (permission === 'granted') {
         console.log('Notification permission granted.');
-        // TODO(developer): Retrieve an Instance ID token for use with FCM.
-        // ...
+        messaging.getToken().then((token) => {
+        if (token) {
+            return post('/subscribe', {token, topic});
+            console.log(token);
+        } else {
+            // Show permission request.
+            console.log('No Instance ID token available. Request permission to generate one.');
+            // Show permission UI.
+        }
+        }).catch((err) => {
+            console.log('An error occurred while retrieving token. ', err);
+        });
       } else {
         console.log('Unable to get permission to notify.');
       }
     });
     // Get Instance ID token. Initially this makes a network call, once retrieved
     // subsequent calls to getToken will return from cache.
-    messaging.getToken().then((currentToken) => {
-      if (currentToken) {
-        console.log(currentToken);
-      } else {
-        // Show permission request.
-        console.log('No Instance ID token available. Request permission to generate one.');
-        // Show permission UI.
-      }
-    }).catch((err) => {
-      console.log('An error occurred while retrieving token. ', err);
-    });
 
     messaging.onMessage((payload) => {
       console.log('Message received. ', payload);
       // ...
     });
 
+    function post(path, data) {
+        return fetch(`https://pomodoro.lit.codes/api${path}`, {
+            method: 'POST',
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+    }
+
+    function send() {
+        post('/', {topic, message});
+    }
+
+    function generateTopic() {
+        return Math.random().toString(36).substring(9);
+    }
   </script>
 </head>
 
 <body>
+    <input type="text" id="message">
+    <button onclick="send()">send</button>
 </body>
 
 </html>
