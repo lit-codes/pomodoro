@@ -4,7 +4,7 @@
   "description": "",
   "main": "get_token.js",
   "scripts": {
-    "send": "node src/send_notification.js"
+    "start": "PKEY=\"$(cat pkey)\" node api/index.js"
   },
   "author": "",
   "license": "ISC",

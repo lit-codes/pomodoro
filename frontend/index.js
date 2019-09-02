@@ -1,4 +1,4 @@
-import Pomodoro from './Pomodoro.js';
+import LiveStore from './LiveStore.js';
 
 let topic = document.location.hash.split('#')[1];
 
@@ -21,16 +21,28 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-const pomodoro = new Pomodoro({ messaging, topic });
+const liveStore = new LiveStore({ messaging, topic });
 
 function generateTopic() {
     return Math.random().toString(36).substring(9);
 }
 
+liveStore.onStoreUpdate = function(store) {
+    const $message = document.querySelector('#message');
+    const $submit = document.querySelector('#submit');
+    $message.value = store.message || '';
+    $submit.disabled = $message.disabled = false;
+};
+
 window.updateStore = function() {
     const $message = document.querySelector('#message');
-    pomodoro.store.message = $message.value;
-    $message.value = '';
-    pomodoro.send({ key: 'message' });
+    const $submit = document.querySelector('#submit');
+    const value = $message.value;
+    $message.value = 'saving...';
+    $submit.disabled = $message.disabled = true;
+    liveStore.update({ message: value });
     return false;
 }
+/*window.onfocus = function() {
+    liveStore.reload();
+}*/

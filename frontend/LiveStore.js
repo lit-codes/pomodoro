@@ -1,12 +1,30 @@
-export default class Pomodoro {
+export default class Live {
     constructor({ topic, messaging, url = '/api' }) {
         this.topic = topic;
         this.messaging = messaging;
         this.url = url;
-        this.store = { key: 'value' };
+        this.init();
+    }
 
-        this.subscribe();
+    async init() {
+        await this.reload();
+        await this.subscribe();
         this.handleStoreUpdate();
+    }
+
+    async reload() {
+        const store = await this.get(this.topic);
+        return this.updateStore(store || {}, true);
+    }
+
+    async get() {
+        return idbKeyval.get(this.topic);
+    }
+
+    update(store) {
+        const { topic } = this;
+
+        this.post('/send', { topic, message: { topic, store } });
     }
 
     async subscribe() {
@@ -31,6 +49,23 @@ export default class Pomodoro {
         });
     }
 
+    handleStoreUpdate() {
+        this.messaging.onMessage(({ data: { message } }) => {
+            const { topic, store } = JSON.parse(message);
+            this.updateStore(store);
+        });
+    }
+
+    updateStore(store, skipSave) {
+        const {topic} = this;
+        if (!skipSave) {
+            idbKeyval.set(topic, store);
+        }
+        if (typeof this.onStoreUpdate === 'function') {
+            this.onStoreUpdate(store);
+        }
+    }
+
     post(path, data) {
         const { url } = this;
         return fetch(`${url}${path}`, {
@@ -40,18 +75,6 @@ export default class Pomodoro {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(data),
-        });
-    }
-
-    async send() {
-        const { topic, store } = this;
-        return this.post('/send', { topic, message: { topic, store } });
-    }
-
-    handleStoreUpdate() {
-        this.messaging.onMessage(({ data: { message } }) => {
-            const { topic, store } = JSON.parse(message);
-            idbKeyval.set(topic, store);
         });
     }
 }
