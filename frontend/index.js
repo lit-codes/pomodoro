@@ -19,31 +19,67 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-const liveStore = new LiveStore({ messaging, topic });
-
-liveStore.init();
+const $timer = document.querySelector('#timer');
 
 function generateTopic() {
     return Math.random().toString(36).substring(9);
 }
 
-liveStore.onStoreUpdate = function(store) {
-    const $message = document.querySelector('#message');
-    const $submit = document.querySelector('#submit');
-    $message.value = store.message || '';
-    $submit.disabled = $message.disabled = false;
-};
+class App extends preact.Component {
+    componentDidMount() {
+        this.liveStore = new LiveStore({ messaging, topic });
+        this.liveStore.init();
+        this.timer = new Timer(25 * 60);
 
-window.updateStore = function() {
-    const $message = document.querySelector('#message');
-    const $submit = document.querySelector('#submit');
-    const value = $message.value;
-    $message.value = 'saving...';
-    $submit.disabled = $message.disabled = true;
-    liveStore.requestUpdate({ message: value });
-    return false;
+        this.liveStore.onStoreUpdate = this.onStoreUpdate.bind(this);
+
+        document.addEventListener('visibilitychange', this.onTabSwitch.bind(this));
+
+        this.timer.onUpdate = this.onTimerUpdate.bind(this);
+    }
+
+    onTabSwitch() {
+        if(document.hidden) return;
+        this.liveStore.reload();
+    }
+
+    onStoreUpdate({running, seconds}) {
+        if (this.timer.running !== running) {
+            if (this.timer.running) {
+                this.timer.stop();
+            } else {
+                this.timer.start();
+            }
+        }
+        this.timer.setSeconds(seconds);
+    }
+
+    onTimerUpdate() {
+        this.setState({time: this.timer.display()});
+    }
+
+    render() {
+        return html`<div>
+            <${TimeDisplay} time=${this.state.time}/>
+            <${TypeSelector} />
+            <button onClick=${this.reset.bind(this)}>reset</button>
+            <button onClick=${this.pause.bind(this)}>pause</button>
+            <button onClick=${this.start.bind(this)}>start</button>
+        </div>`;
+    }
+
+    start() {
+        this.liveStore.requestUpdate({ running: true, seconds: this.timer.seconds });
+    }
+
+    pause() {
+        this.liveStore.requestUpdate({ running: false, seconds: this.timer.seconds });
+    }
+
+    reset() {
+        this.liveStore.requestUpdate({ running: false, seconds: this.timer.initialSeconds });
+    }
+
 }
-document.addEventListener('visibilitychange', function(e) {
-    if(document.hidden) return;
-    liveStore.reload();
-});
+
+preact.render(preact.h(App), document.getElementById('app'));
