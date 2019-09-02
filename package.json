@@ -12,5 +12,8 @@
     "express": "^4.17.1",
     "firebase-admin": "^8.4.0",
     "googleapis": "^42.0.0"
+  },
+  "devDependencies": {
+    "now": "^16.1.2"
   }
 }
