@@ -1,9 +1,8 @@
-export default class Live {
+class LiveStore {
     constructor({ topic, messaging, url = '/api' }) {
         this.topic = topic;
         this.messaging = messaging;
         this.url = url;
-        this.init();
     }
 
     async init() {
@@ -78,3 +77,5 @@ export default class Live {
         });
     }
 }
+
+globalThis.LiveStore = LiveStore;

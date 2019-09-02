@@ -1,5 +1,3 @@
-import LiveStore from './LiveStore.js';
-
 let topic = document.location.hash.split('#')[1];
 
 if (!topic) {
@@ -23,6 +21,8 @@ const messaging = firebase.messaging();
 
 const liveStore = new LiveStore({ messaging, topic });
 
+liveStore.init();
+
 function generateTopic() {
     return Math.random().toString(36).substring(9);
 }
@@ -43,6 +43,7 @@ window.updateStore = function() {
     liveStore.update({ message: value });
     return false;
 }
-/*window.onfocus = function() {
+document.addEventListener('visibilitychange', function(e) {
+    if(document.hidden) return;
     liveStore.reload();
-}*/
+});
