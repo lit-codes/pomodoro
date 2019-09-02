@@ -23,6 +23,8 @@ class LiveStore {
     requestUpdate(store) {
         const { topic } = this;
 
+        this.updateStore(store);
+
         return this.post('/send', { topic, message: { topic, store } });
     }
 
