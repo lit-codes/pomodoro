@@ -3,26 +3,20 @@
 // are not available in the service worker.
 importScripts('https://www.gstatic.com/firebasejs/6.3.4/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/6.3.4/firebase-messaging.js');
+importScripts('https://cdn.jsdelivr.net/npm/idb-keyval@3/dist/idb-keyval-iife.min.js');
 
 // Initialize the Firebase app in the service worker by passing in the
 // messagingSenderId.
 firebase.initializeApp({
-  'messagingSenderId': '373119630380'
+    'messagingSenderId': '373119630380'
 });
 
 // Retrieve an instance of Firebase Messaging so that it can handle background
 // messages.
 const messaging = firebase.messaging();
 
-messaging.setBackgroundMessageHandler(function (payload) {
-  console.log('[firebase-messaging-sw.js] Received background message ', payload);
-  // Customize notification here
-  const notificationTitle = 'Background Message Title';
-  const notificationOptions = {
-    body: 'Background Message body.',
-    icon: '/firebase-logo.png'
-  };
-
-  return self.registration.showNotification(notificationTitle,
-    notificationOptions);
+messaging.setBackgroundMessageHandler(function({data: {message}}) {
+    const {topic, store} = JSON.parse(message);
+    idbKeyval.set(topic, store);
+    return new Promise(() => {});
 });

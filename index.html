@@ -4,76 +4,12 @@
 <head>
   <script src="https://www.gstatic.com/firebasejs/6.4.2/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/6.4.1/firebase-messaging.js"></script>
-  <script>
-    let topic = document.location.hash.split('#')[1];
-    if (!topic) {
-        topic = generateTopic();
-        document.location.hash = topic;
-    }
-    // Your web app's Firebase configuration
-    var firebaseConfig = {
-      apiKey: "AIzaSyA-cl-Ly_JyTs5QdTOjNKZnYsfZeI0B7SU",
-      authDomain: "pomodoro-lit-codes.firebaseapp.com",
-      databaseURL: "https://pomodoro-lit-codes.firebaseio.com",
-      projectId: "pomodoro-lit-codes",
-      storageBucket: "",
-      messagingSenderId: "373119630380",
-      appId: "1:373119630380:web:25e1146cb81bbb5c"
-    };
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const messaging = firebase.messaging();
-    Notification.requestPermission().then((permission) => {
-      if (permission === 'granted') {
-        console.log('Notification permission granted.');
-        messaging.getToken().then((token) => {
-        if (token) {
-            return post('/subscribe', {token, topic});
-            console.log(token);
-        } else {
-            // Show permission request.
-            console.log('No Instance ID token available. Request permission to generate one.');
-            // Show permission UI.
-        }
-        }).catch((err) => {
-            console.log('An error occurred while retrieving token. ', err);
-        });
-      } else {
-        console.log('Unable to get permission to notify.');
-      }
-    });
-    // Get Instance ID token. Initially this makes a network call, once retrieved
-    // subsequent calls to getToken will return from cache.
-
-    messaging.onMessage((payload) => {
-      console.log('Message received. ', payload);
-      // ...
-    });
-
-    function post(path, data) {
-        return fetch(`/api${path}`, {
-            method: 'POST',
-            cache: 'no-cache',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        });
-    }
-
-    function send() {
-        post('/send', {topic, message});
-        return false;
-    }
-
-    function generateTopic() {
-        return Math.random().toString(36).substring(9);
-    }
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/idb-keyval@3/dist/idb-keyval-iife.min.js"></script>
+  <script src="./frontend/index.js" type="module"></script>
 </head>
 
 <body>
-    <form onclick="send()">
+    <form onclick="updateStore(message)">
         <input type="text" id="message">
         <button type="submit">send</button>
     </form>
