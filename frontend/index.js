@@ -40,7 +40,7 @@ window.updateStore = function() {
     const value = $message.value;
     $message.value = 'saving...';
     $submit.disabled = $message.disabled = true;
-    liveStore.update({ message: value });
+    liveStore.requestUpdate({ message: value });
     return false;
 }
 document.addEventListener('visibilitychange', function(e) {

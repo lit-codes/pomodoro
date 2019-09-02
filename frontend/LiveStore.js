@@ -20,10 +20,10 @@ class LiveStore {
         return idbKeyval.get(this.topic);
     }
 
-    update(store) {
+    requestUpdate(store) {
         const { topic } = this;
 
-        this.post('/send', { topic, message: { topic, store } });
+        return this.post('/send', { topic, message: { topic, store } });
     }
 
     async subscribe() {
