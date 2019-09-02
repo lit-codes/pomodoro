@@ -62,7 +62,7 @@
     }
 
     function send() {
-        post('/', {topic, message});
+        post('/send', {topic, message});
         return false;
     }
 

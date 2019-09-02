@@ -1,11 +1,10 @@
 const messaging = require('../messaging');
 
 module.exports = (req, res) => {
-	const {body: {topic, token}} = req;
-   messaging.subscribeToTopic(topic, token)
+	const {body: {topic, message}} = req;
+    messaging.sendToTopic(topic, message)
         .then((responses) => {
-	    res.send('Subscribed successfully');
-		console.log(responses);
+	    res.send('message sent successfully');
         })
         .catch((error) => {
 	    res.send('Something went wrong, check the logs');

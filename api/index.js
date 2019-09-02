@@ -1,19 +1,15 @@
-const FirebaseMessaging = require('./FirebaseMessaging');
-const serviceAccount = require("./service-account.json");
-const messaging = new FirebaseMessaging({
-  ...serviceAccount,
-  private_key: process.env.PKEY.replace(/\\n/g, "\n"),
-});
+const express = require('express');
+const bodyParser = require('body-parser');
 
-module.exports = (req, res) => {
-	const {body: {topic, message}} = req;
-    messaging.sendToTopic(topic, message)
-        .then((responses) => {
-	    res.send('message sent successfully');
-        })
-        .catch((error) => {
-	    res.send('Something went wrong, check the logs');
-            console.log(error);
-        });
-};
+const send = require('./send');
+const subscribe = require('./subscribe');
 
+const app = express();
+app.use(bodyParser.json())
+app.use(express.static('./'))
+const port = 3000;
+
+app.post('/api/send', send)
+app.post('/api/subscribe', subscribe)
+
+app.listen(port, () => console.log(`Example app listening on port ${port}!`))

@@ -1,10 +1,10 @@
-var admin = require("firebase-admin");
+const admin = require('firebase-admin');
 
 class FirebaseMessaging {
     constructor(serviceAccount) {
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount),
-            databaseURL: "https://pomodoro-lit-codes.firebaseio.com"
+            databaseURL: 'https://pomodoro-lit-codes.firebaseio.com'
         });
         this.clients = new Set();
     }
