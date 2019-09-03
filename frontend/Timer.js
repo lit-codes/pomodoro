@@ -1,8 +1,13 @@
 class Timer {
     constructor(seconds) {
-        this.initialSeconds = seconds;
         this.running = false;
         this.setSeconds(seconds);
+        this.type = 'pomodoro-type';
+        this.typeToSeconds = {
+            'pomodoro-type': 25 * 60,
+            'short-break-type': 5 * 60,
+            'long-break-type': 10 * 60,
+        };
     }
 
     setSeconds(seconds) {
@@ -19,9 +24,20 @@ class Timer {
         }, 1000);
     }
 
-    stop() {
+    pause() {
         this.running = false;
         clearInterval(this.countDown);
+    }
+
+
+    setType(type) {
+        this.type = type;
+        this.reset();
+    }
+
+    reset() {
+        this.pause();
+        this.seconds = this.typeToSeconds[this.type];
     }
 
     update() {
@@ -30,7 +46,7 @@ class Timer {
         }
     }
 
-    display() {
+    get display() {
         const date = new Date();
 
         date.setMinutes(this.seconds/60);

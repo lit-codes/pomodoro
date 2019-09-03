@@ -3,29 +3,32 @@ class LiveStore {
         this.topic = topic;
         this.messaging = messaging;
         this.url = url;
+        this.id = Math.random().toString(36).substring(2);
     }
 
     async init() {
         await this.reload();
         await this.subscribe();
-        this.handleStoreUpdate();
+        this.handlePushMessage();
     }
 
     async reload() {
         const store = await this.get(this.topic);
-        return this.updateStore(store || {}, true);
+        return this.emitOnStoreUpdate('reload', store);
     }
 
     async get() {
-        return idbKeyval.get(this.topic);
+        return await idbKeyval.get(this.topic) || {};
     }
 
-    requestUpdate(store) {
-        const { topic } = this;
+    async requestUpdate(action, change) {
+        const { topic, id } = this;
 
-        this.updateStore(store);
+        const currentStore = await this.get(this.topic);
+        const store = {...currentStore, ...change};
+        await this.saveToStore(store);
 
-        return this.post('/send', { topic, message: { topic, store } });
+        return this.post('/send', { topic, message: { topic, id, action, store } });
     }
 
     async subscribe() {
@@ -50,20 +53,25 @@ class LiveStore {
         });
     }
 
-    handleStoreUpdate() {
+    handlePushMessage() {
         this.messaging.onMessage(({ data: { message } }) => {
-            const { topic, store } = JSON.parse(message);
-            this.updateStore(store);
+            const { topic, id, action, store } = JSON.parse(message);
+            console.log('update arrived', topic, id, action, store);
+            if (id === this.id) return;
+            this.saveToStore(store);
+            this.emitOnStoreUpdate(action, store);
         });
     }
 
-    updateStore(store, skipSave) {
+    saveToStore(store) {
         const {topic} = this;
-        if (!skipSave) {
-            idbKeyval.set(topic, store);
-        }
+
+        idbKeyval.set(topic, store);
+    }
+
+    emitOnStoreUpdate(action, store) {
         if (typeof this.onStoreUpdate === 'function') {
-            this.onStoreUpdate(store);
+            this.onStoreUpdate(action, store);
         }
     }
 

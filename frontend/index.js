@@ -34,8 +34,12 @@ class App extends preact.Component {
         this.liveStore.onStoreUpdate = this.onStoreUpdate.bind(this);
 
         document.addEventListener('visibilitychange', this.onTabSwitch.bind(this));
+        document.addEventListener('onblur', () => {this.isActive = false;});
+        document.addEventListener('onfocus', () => {this.isActive = true;});
 
         this.timer.onUpdate = this.onTimerUpdate.bind(this);
+
+        this.forceUpdate();
     }
 
     onTabSwitch() {
@@ -43,41 +47,87 @@ class App extends preact.Component {
         this.liveStore.reload();
     }
 
-    onStoreUpdate({running, seconds}) {
-        if (this.timer.running !== running) {
-            if (this.timer.running) {
-                this.timer.stop();
-            } else {
+    onStoreUpdate(action, {seconds, type}) {
+        switch(action) {
+            case 'start': 
                 this.timer.start();
-            }
+                return this.forceUpdate();
+            case 'pause': 
+                this.timer.pause();
+                return this.forceUpdate();
+            case 'reset': 
+                this.timer.reset();
+                return this.forceUpdate();
+            case 'tick' : 
+                this.timer.setSeconds(seconds);
+                return this.forceUpdate();
+            case 'type' : 
+                this.timer.setType(type);
+                return this.forceUpdate();
+            case 'reload':
+                if (type) this.timer.setType(type);
+                if (seconds) this.timer.setSeconds(seconds);
+                return this.forceUpdate();
         }
-        this.timer.setSeconds(seconds);
     }
 
     onTimerUpdate() {
-        this.setState({time: this.timer.display()});
+        // render
+        this.forceUpdate();
+        if (this.isActive) {
+            this.liveStore.requestUpdate('tick', { seconds: this.timer.seconds })
+        }
     }
 
-    render() {
-        return html`<div>
-            <${TimeDisplay} time=${this.state.time}/>
-            <${TypeSelector} />
-            <button onClick=${this.reset.bind(this)}>reset</button>
-            <button onClick=${this.pause.bind(this)}>pause</button>
-            <button onClick=${this.start.bind(this)}>start</button>
-        </div>`;
+    onTypeChange(type) {
+        this.timer.setType(type);
+        this.liveStore.requestUpdate('type', { type });
+        this.forceUpdate();
     }
 
     start() {
-        this.liveStore.requestUpdate({ running: true, seconds: this.timer.seconds });
+        this.timer.start();
+        this.liveStore.requestUpdate('start');
+        this.forceUpdate();
     }
 
     pause() {
-        this.liveStore.requestUpdate({ running: false, seconds: this.timer.seconds });
+        this.timer.pause();
+        this.liveStore.requestUpdate('pause');
+        this.forceUpdate();
     }
 
     reset() {
-        this.liveStore.requestUpdate({ running: false, seconds: this.timer.initialSeconds });
+        this.timer.reset();
+        this.liveStore.requestUpdate('reset');
+        this.forceUpdate();
+    }
+
+    render() {
+        if (!this.timer) return html`<div>Loading...<//>`;
+        return html`<div>
+            <${TimeDisplay} time=${this.timer.display}/>
+            <${TypeSelector} onTypeChange=${this.onTypeChange.bind(this)} type=${this.timer.type} />
+            <!-- Accent-colored raised button with ripple -->
+            <button
+                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary"
+                onClick=${this.start.bind(this)}
+            >
+                Start
+            </button>
+            <button
+                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary"
+                onClick=${this.pause.bind(this)}
+            >
+                Pause
+            </button>
+            <button
+                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary"
+                onClick=${this.reset.bind(this)}
+            >
+                Reset
+            </button>
+        </div>`;
     }
 
 }

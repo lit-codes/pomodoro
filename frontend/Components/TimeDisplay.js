@@ -1,9 +1,7 @@
 class TimeDisplay extends preact.Component {
     render() {
         return html`<div>
-            <div>${this.props.time}</div>
+            ${this.props.time}
         </div>`;
     }
 };
-
-window.TimeDisplay = TimeDisplay;
