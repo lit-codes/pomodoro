@@ -13,7 +13,5 @@
     "firebase-admin": "^8.4.0",
     "googleapis": "^42.0.0"
   },
-  "devDependencies": {
-    "now": "^16.1.2"
-  }
+  "devDependencies": {}
 }
