@@ -18,14 +18,14 @@ class TypeSelector extends preact.Component {
                     checked=${this.props.type === 'short-break-type' ? true : false}
                     onClick=${this.changeType('short-break-type')}
                 />
-                <span>Short</span>
+                <span>Short break</span>
             </label>
             <label for="long-break-type">
                 <input type="radio" id="long-break-type" name="timer-type"
                     checked=${this.props.type === 'long-break-type' ? true : false}
                     onClick=${this.changeType('long-break-type')}
                 />
-                <span>Long</span>
+                <span>Long break</span>
             </label>
         </div>`;
     }

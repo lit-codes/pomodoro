@@ -39,6 +39,13 @@ class App extends preact.Component {
         this.timer.onReach = this.onTimerReach.bind(this);
 
         this.forceUpdate();
+
+        setInterval(() => {
+            if (!this.waitBeforeSendUpdate--) {
+                this.liveStore.requestUpdate('tick', { seconds: this.timer.seconds });
+                this.waitBeforeSendUpdate = 5;
+            }
+        }, 1000);
     }
 
     onTabSwitch() {
@@ -74,10 +81,6 @@ class App extends preact.Component {
     onTimerUpdate() {
         // render
         this.forceUpdate();
-        if (!this.waitBeforeSendUpdate--) {
-            this.liveStore.requestUpdate('tick', { seconds: this.timer.seconds });
-            this.waitBeforeSendUpdate = 5;
-        }
     }
 
     onTimerReach() {
