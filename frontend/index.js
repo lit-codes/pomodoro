@@ -143,6 +143,9 @@ class App extends preact.Component {
                     Reset
                 </button>
             </div>
+            <div class="row center-align">
+                <img src="https://chart.googleapis.com/chart?cht=qr&chs=177x177&chld=H&chl=${document.location.toString().replace('#', '%23')}" />
+            </div>
         </div>`;
     }
 
