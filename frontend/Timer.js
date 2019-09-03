@@ -18,7 +18,10 @@ class Timer {
     start() {
         this.running = true;
         this.countDown = setInterval(() => {
-            if (this.seconds === 0) return this.stop();
+            if (this.seconds === 0) {
+                this.reach();
+                return this.reset();
+            }
             this.seconds--;
             this.update();
         }, 1000);
@@ -35,6 +38,16 @@ class Timer {
         this.reset();
     }
 
+    setRunning(running) {
+        if (!!this.running === !!running) return;
+
+        if (this.running) {
+            this.stop();
+        } else {
+            this.start();
+        }
+    }
+
     reset() {
         this.pause();
         this.seconds = this.typeToSeconds[this.type];
@@ -43,6 +56,12 @@ class Timer {
     update() {
         if (typeof this.onUpdate === 'function') {
             this.onUpdate();
+        }
+    }
+
+    reach() {
+        if (typeof this.onReach === 'function') {
+            this.onReach();
         }
     }
 

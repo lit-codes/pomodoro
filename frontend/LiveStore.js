@@ -31,6 +31,11 @@ class LiveStore {
         return this.post('/send', { topic, message: { topic, id, action, store } });
     }
 
+    async sendNotification(notification) {
+        const { topic } = this;
+        return this.post('/send', {topic,notification });
+    }
+
     async subscribe() {
         const { messaging, topic } = this;
         return new Promise((resolve, reject) => {
@@ -54,8 +59,9 @@ class LiveStore {
     }
 
     handlePushMessage() {
-        this.messaging.onMessage(({ data: { message } }) => {
-            const { topic, id, action, store } = JSON.parse(message);
+        this.messaging.onMessage(({ data }) => {
+            if (!data) return;
+            const { topic, id, action, store } = JSON.parse(data.message);
             console.log('update arrived', topic, id, action, store);
             if (id === this.id) return;
             this.saveToStore(store);

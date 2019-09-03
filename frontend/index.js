@@ -34,10 +34,9 @@ class App extends preact.Component {
         this.liveStore.onStoreUpdate = this.onStoreUpdate.bind(this);
 
         document.addEventListener('visibilitychange', this.onTabSwitch.bind(this));
-        document.addEventListener('onblur', () => {this.isActive = false;});
-        document.addEventListener('onfocus', () => {this.isActive = true;});
 
         this.timer.onUpdate = this.onTimerUpdate.bind(this);
+        this.timer.onReach = this.onTimerReach.bind(this);
 
         this.forceUpdate();
     }
@@ -47,26 +46,27 @@ class App extends preact.Component {
         this.liveStore.reload();
     }
 
-    onStoreUpdate(action, {seconds, type}) {
+    onStoreUpdate(action, {seconds, type, running}) {
         switch(action) {
-            case 'start': 
+            case 'start':
                 this.timer.start();
                 return this.forceUpdate();
-            case 'pause': 
+            case 'pause':
                 this.timer.pause();
                 return this.forceUpdate();
-            case 'reset': 
+            case 'reset':
                 this.timer.reset();
                 return this.forceUpdate();
-            case 'tick' : 
+            case 'tick' :
                 this.timer.setSeconds(seconds);
                 return this.forceUpdate();
-            case 'type' : 
+            case 'type' :
                 this.timer.setType(type);
                 return this.forceUpdate();
             case 'reload':
                 if (type) this.timer.setType(type);
                 if (seconds) this.timer.setSeconds(seconds);
+                if (running !== 'undefined') this.timer.setRunning(running);
                 return this.forceUpdate();
         }
     }
@@ -74,59 +74,75 @@ class App extends preact.Component {
     onTimerUpdate() {
         // render
         this.forceUpdate();
-        if (this.isActive) {
-            this.liveStore.requestUpdate('tick', { seconds: this.timer.seconds })
+        if (!this.waitBeforeSendUpdate--) {
+            this.liveStore.requestUpdate('tick', { seconds: this.timer.seconds });
+            this.waitBeforeSendUpdate = 5;
         }
+    }
+
+    onTimerReach() {
+        this.liveStore.sendNotification({
+            title: 'Pomodoro',
+            body: 'Time is up!',
+            clickAction: document.location.toString(),
+        });
     }
 
     onTypeChange(type) {
         this.timer.setType(type);
-        this.liveStore.requestUpdate('type', { type });
+        this.liveStore.requestUpdate('type', { type, running: false, seconds: this.timer.seconds });
         this.forceUpdate();
     }
 
     start() {
         this.timer.start();
-        this.liveStore.requestUpdate('start');
+        this.liveStore.requestUpdate('start', {running: true});
         this.forceUpdate();
     }
 
     pause() {
         this.timer.pause();
-        this.liveStore.requestUpdate('pause');
+        this.liveStore.requestUpdate('pause', {running: false});
         this.forceUpdate();
     }
 
     reset() {
         this.timer.reset();
-        this.liveStore.requestUpdate('reset');
+        this.liveStore.requestUpdate('reset', {running: false});
         this.forceUpdate();
     }
 
     render() {
         if (!this.timer) return html`<div>Loading...<//>`;
-        return html`<div>
-            <${TimeDisplay} time=${this.timer.display}/>
-            <${TypeSelector} onTypeChange=${this.onTypeChange.bind(this)} type=${this.timer.type} />
-            <!-- Accent-colored raised button with ripple -->
-            <button
-                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary"
-                onClick=${this.start.bind(this)}
-            >
-                Start
-            </button>
-            <button
-                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary"
-                onClick=${this.pause.bind(this)}
-            >
-                Pause
-            </button>
-            <button
-                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary"
-                onClick=${this.reset.bind(this)}
-            >
-                Reset
-            </button>
+        return html`<div class="container">
+            <div class="row center-align">
+                <h1>
+                    <${TimeDisplay} time=${this.timer.display}/>
+                </h1>
+            </div>
+            <div class="row center-align">
+                <${TypeSelector} onTypeChange=${this.onTypeChange.bind(this)} type=${this.timer.type} />
+            </div>
+            <div class="row center-align">
+                <button
+                    class="waves-effect waves-light btn-small"
+                    onClick=${this.start.bind(this)}
+                >
+                    Start
+                </button>
+                <button
+                    class="waves-effect waves-light btn-small"
+                    onClick=${this.pause.bind(this)}
+                >
+                    Pause
+                </button>
+                <button
+                    class="waves-effect waves-light btn-small"
+                    onClick=${this.reset.bind(this)}
+                >
+                    Reset
+                </button>
+            </div>
         </div>`;
     }
 

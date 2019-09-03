@@ -1,9 +1,14 @@
 const messaging = require('../messaging');
 
 module.exports = (req, res) => {
-    const { body: { topic, message } } = req;
-    messaging.sendToTopic(topic, { message: JSON.stringify(message) })
-        .then((responses) => {
+    const { body: {topic, notification, message} } = req;
+    const payload = {};
+
+    if (notification) payload.notification = notification;
+    if (message) payload.data = { message: JSON.stringify(message) };
+
+    messaging.sendToTopic(topic, payload)
+        .then(() => {
             res.send('message sent successfully');
         })
         .catch((error) => {

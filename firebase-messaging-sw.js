@@ -4,7 +4,6 @@
 importScripts('https://www.gstatic.com/firebasejs/6.3.4/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/6.3.4/firebase-messaging.js');
 importScripts('https://cdn.jsdelivr.net/npm/idb-keyval@3/dist/idb-keyval-iife.min.js');
-importScripts('./frontend/LiveStore.js');
 
 // Initialize the Firebase app in the service worker by passing in the
 // messagingSenderId.
@@ -16,9 +15,13 @@ firebase.initializeApp({
 // messages.
 const messaging = firebase.messaging();
 
-messaging.setBackgroundMessageHandler(function({data: {message}}) {
-    const {topic, store} = JSON.parse(message);
-    const liveStore = new LiveStore({topic, messaging});
-    liveStore.updateStore(store);
-    return new Promise(() => {});
+messaging.setBackgroundMessageHandler(function(e) {
+    console.log(e);
+    const notification = e.notification;
+
+    if (!notification) return new Promise(() => {});
+    return self.registration.showNotification(notification.title, {
+        body: notification.body,
+    });
 });
+

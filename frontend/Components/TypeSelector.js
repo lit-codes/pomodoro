@@ -6,41 +6,26 @@ class TypeSelector extends preact.Component {
     }
     render() {
         return html`<div>
-            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="pomodoro-type">
-                <input
-                    type="radio"
-                    id="pomodoro-type"
-                    class="mdl-radio__button"
-                    name="timer-type"
-                    value="pomodoro-type"
-                    checked=${this.props.type === 'pomodoro-type' ? 'checked' : ''}
+            <label for="pomodoro-type">
+                <input type="radio" id="pomodoro-type" name="timer-type"
+                    checked=${this.props.type === 'pomodoro-type' ? true : false}
                     onClick=${this.changeType('pomodoro-type')}
                 />
-                <span class="mdl-radio__label">Pomodoro</span>
+                <span>Pomodoro</span>
             </label>
-            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="short-break-type">
-                <input
-                    type="radio"
-                    id="short-break-type"
-                    class="mdl-radio__button"
-                    name="timer-type"
-                    value="short-break-type"
-                    checked=${this.props.type === 'short-break-type' ? 'checked' : ''}
+            <label for="short-break-type">
+                <input type="radio" id="short-break-type" name="timer-type"
+                    checked=${this.props.type === 'short-break-type' ? true : false}
                     onClick=${this.changeType('short-break-type')}
                 />
-                <span class="mdl-radio__label">Short break</span>
+                <span>Short</span>
             </label>
-            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="long-break-type">
-                <input
-                    type="radio"
-                    id="long-break-type"
-                    class="mdl-radio__button"
-                    name="timer-type"
-                    value="long-break-type"
-                    checked=${this.props.type === 'long-break-type' ? 'checked' : ''}
+            <label for="long-break-type">
+                <input type="radio" id="long-break-type" name="timer-type"
+                    checked=${this.props.type === 'long-break-type' ? true : false}
                     onClick=${this.changeType('long-break-type')}
                 />
-                <span class="mdl-radio__label">Long break</span>
+                <span>Long</span>
             </label>
         </div>`;
     }
