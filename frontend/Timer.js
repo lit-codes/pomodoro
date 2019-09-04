@@ -1,45 +1,31 @@
 class Timer {
-    constructor(seconds) {
-        this.running = false;
-        this.startTime = 0;
-        this.type = 'pomodoro-type';
+    constructor(liveStore) {
+        this.liveStore = liveStore;
         this.typeToSeconds = {
             'pomodoro-type': 25 * 60,
             'short-break-type': 5 * 60,
             'long-break-type': 10 * 60,
         };
+        this.liveStore.onStoreUpdate = this.onStoreUpdate.bind(this);
     }
 
-    setStartTime(startTime) {
-        this.startTime = startTime;
-    }
+    onStoreUpdate(oldStore, newStore) {
+        if (!!oldStore.running === !!newStore.running) return this.update();
 
-    setPassedTime(passedTime) {
-        this.passedTime = passedTime;
-    }
-
-    setType(type) {
-        this.type = type;
-    }
-
-    setRunning(running) {
-        if (!!this.running === !!running) return;
-
-        if (this.running) {
+        if (oldStore.running) {
             this.pause();
         } else {
             this.start();
         }
+
+        this.update();
     }
 
-    start() {
-        if (this.running) return;
-        if (this.passedTime) {
-            this.setStartTime(this.now - this.passedTime)
-        } else {
-            this.setStartTime(this.now);
-        }
-        this.running = true;
+    async start() {
+        this.updateStore({
+            running: true,
+            startTime: this.passedTime ? (this.now - this.passedTime) : this.now,
+        });
         this.countDown = setInterval(() => {
             if (this.seconds === 0) {
                 this.reach();
@@ -49,19 +35,27 @@ class Timer {
         }, 1000);
     }
 
-    pause() {
-        if (!this.running) return;
-        this.running = false;
-        this.passedTime = this.now - this.startTime;
+    async pause() {
         clearInterval(this.countDown);
+        await this.updateStore({
+            running: false,
+            passedTime: this.now - (this.startTime || 0),
+        });
         this.update();
     }
 
-    reset() {
+    async reset() {
         clearInterval(this.countDown);
-        this.running = false;
-        this.startTime = 0;
-        this.passedTime = 0;
+        await this.updateStore({
+            running: false,
+            startTime: 0,
+            passedTime: 0,
+        });
+        this.update();
+    }
+
+    async setType(type) {
+        await this.updateStore({type});
         this.update();
     }
 
@@ -75,6 +69,10 @@ class Timer {
         if (typeof this.onReach === 'function') {
             this.onReach();
         }
+    }
+
+    async updateStore(change) {
+        return this.liveStore.requestUpdate(change);
     }
 
     get display() {
@@ -97,6 +95,26 @@ class Timer {
         } else {
             return oneCycleInSeconds - (this.passedTime || 0);
         }
+    }
+
+    get store() {
+        return this.liveStore.store;
+    }
+
+    get startTime() {
+        return this.liveStore.store.startTime || 0;
+    }
+
+    get passedTime() {
+        return this.liveStore.store.passedTime || 0;
+    }
+
+    get type() {
+        return this.liveStore.store.type || 'pomodoro-type';
+    }
+
+    get running() {
+        return this.liveStore.store.running || false;
     }
 }
 

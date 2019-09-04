@@ -29,27 +29,14 @@ class App extends preact.Component {
     componentDidMount() {
         this.liveStore = new LiveStore({ messaging, topic });
         this.liveStore.init();
-        this.timer = new Timer(25 * 60);
-
-        this.liveStore.onStoreUpdate = this.onStoreUpdate.bind(this);
+        this.timer = new Timer(this.liveStore);
 
         document.addEventListener('visibilitychange', this.onTabSwitch.bind(this));
 
         this.timer.onUpdate = this.onTimerUpdate.bind(this);
         this.timer.onReach = this.onTimerReach.bind(this);
 
-        setInterval(this.sendUpdate.bind(this), 10000);
-
         this.forceUpdate();
-    }
-
-    sendUpdate() {
-        this.liveStore.requestUpdate('tick', {
-            startTime: this.timer.startTime,
-            passedTime: this.timer.passedTime,
-            type: this.timer.type,
-            running: this.timer.running,
-        });
     }
 
     onTabSwitch() {
@@ -57,20 +44,7 @@ class App extends preact.Component {
         this.liveStore.reload();
     }
 
-    onStoreUpdate(action, {startTime, type, running, passedTime}) {
-        if (type !== undefined) this.timer.setType(type);
-
-        if (passedTime !== undefined) this.timer.setPassedTime(passedTime);
-
-        if (startTime !== undefined) this.timer.setStartTime(startTime);
-
-        if (running !== undefined) this.timer.setRunning(running);
-
-        return this.forceUpdate();
-    }
-
     onTimerUpdate() {
-        this.sendUpdate();
         // render
         this.forceUpdate();
     }
@@ -83,20 +57,20 @@ class App extends preact.Component {
         });
     }
 
-    onTypeChange(type) {
-        this.timer.setType(type);
+    async onTypeChange(type) {
+        await this.timer.setType(type);
         this.reset();
     }
 
-    start() {
+    async start() {
         this.timer.start();
     }
 
-    pause() {
+    async pause() {
         this.timer.pause();
     }
 
-    reset() {
+    async reset() {
         this.timer.reset();
     }
 
@@ -115,12 +89,14 @@ class App extends preact.Component {
                 <button
                     class="waves-effect waves-light btn-small"
                     onClick=${this.start.bind(this)}
+                    disabled=${this.timer.running}
                 >
                     Start
                 </button>
                 <button
                     class="waves-effect waves-light btn-small"
                     onClick=${this.pause.bind(this)}
+                    disabled=${!this.timer.running}
                 >
                     Pause
                 </button>

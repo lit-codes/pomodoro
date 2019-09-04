@@ -1,5 +1,6 @@
 class LiveStore {
     constructor({ topic, messaging, url = '/api' }) {
+        this.store = {};
         this.topic = topic;
         this.messaging = messaging;
         this.url = url;
@@ -13,29 +14,28 @@ class LiveStore {
     }
 
     async reload() {
+        const oldStore = this.store;
         const store = await this.get(this.topic);
-        return this.emitOnStoreUpdate('reload', store);
+        this.emitOnStoreUpdate(oldStore, store);
     }
 
     async get() {
-        return await idbKeyval.get(this.topic) || {};
+        const store = await idbKeyval.get(this.topic) || {};
+        this.store = store;
+        return store;
     }
 
-    async requestUpdate(action, change) {
+    async requestUpdate(change = {}) {
         const { topic, id } = this;
 
-        const timestamp = new Date().getTime();
+        await this.saveToStore({...change, timestamp: new Date().getTime()});
 
-        const store = {...change, timestamp};
-
-        this.saveToStore(store);
-
-        return this.post('/send', { topic, message: { topic, id, action, store, timestamp } });
+        this.post('/send', { topic, message: { topic, id, store: this.store } });
     }
 
     async sendNotification(notification) {
         const { topic } = this;
-        return this.post('/send', {topic,notification });
+        this.post('/send', {topic,notification });
     }
 
     async subscribe() {
@@ -63,26 +63,31 @@ class LiveStore {
     handlePushMessage() {
         this.messaging.onMessage(async ({ data }) => {
             if (!data) return;
-            const { topic, id, action, store: change, timestamp } = JSON.parse(data.message);
-            if (id === this.id) return;
-            const currentStore = await this.get(this.topic);
-            if (currentStore.timestamp > change.timestamp) return;
-            const store = {...currentStore, ...change};
-        
-            this.saveToStore(store);
-            this.emitOnStoreUpdate(action, store);
+            const oldStore = this.store;
+
+            const { topic, id, store } = JSON.parse(data.message);
+            if (id === this.id || oldStore.timestamp > store.timestamp) return;
+
+            await this.saveToStore(store);
+            this.emitOnStoreUpdate(oldStore, store);
         });
     }
 
-    async saveToStore(store) {
+    async saveToStore(change) {
         const {topic} = this;
+
+        const currentStore = await this.get(this.topic);
+
+        const store = {...currentStore, ...change};
+
+        this.store = store;
 
         return idbKeyval.set(topic, store);
     }
 
-    emitOnStoreUpdate(action, store) {
+    emitOnStoreUpdate(oldStore, newStore) {
         if (typeof this.onStoreUpdate === 'function') {
-            this.onStoreUpdate(action, store);
+            this.onStoreUpdate(oldStore, newStore);
         }
     }
 
