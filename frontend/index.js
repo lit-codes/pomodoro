@@ -31,17 +31,10 @@ class App extends preact.Component {
         this.liveStore.init();
         this.timer = new Timer(this.liveStore);
 
-        document.addEventListener('visibilitychange', this.onTabSwitch.bind(this));
-
         this.timer.onUpdate = this.onTimerUpdate.bind(this);
         this.timer.onReach = this.onTimerReach.bind(this);
 
         this.forceUpdate();
-    }
-
-    onTabSwitch() {
-        if(document.hidden) return;
-        this.liveStore.reload();
     }
 
     onTimerUpdate() {

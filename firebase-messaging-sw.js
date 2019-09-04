@@ -27,6 +27,8 @@ messaging.setBackgroundMessageHandler(function({notification, data}) {
         const liveStore = new LiveStore({ messaging, topic });
 
         liveStore.saveToStore(store);
+
+        return new Promise(() => {});
     }
 });
 

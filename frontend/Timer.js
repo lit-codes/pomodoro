@@ -25,7 +25,7 @@ class Timer {
         if (this.countDown) return;
 
         this.countDown = setInterval(() => {
-            if (this.seconds === 0) {
+            if (this.seconds <= 0) {
                 this.reach();
                 this.reset();
             }
