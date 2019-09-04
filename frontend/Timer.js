@@ -12,22 +12,17 @@ class Timer {
     onStoreUpdate(oldStore, newStore) {
         if (!!oldStore.running === !!newStore.running) return this.update();
 
-        if (oldStore.running) {
-            this.pause();
+        if (newStore.running) {
+            this.startCountDown();
         } else {
-            this.start();
+            this.stopCountDown();
         }
 
         this.update();
     }
 
-    async start() {
-        if (!this.running) {
-            this.updateStore({
-                running: true,
-                startTime: this.passedTime ? (this.now - this.passedTime) : this.now,
-            });
-        }
+    startCountDown() {
+        if (this.countDown) return;
 
         this.countDown = setInterval(() => {
             if (this.seconds === 0) {
@@ -38,27 +33,53 @@ class Timer {
         }, 1000);
     }
 
-    async pause() {
+    stopCountDown() {
         clearInterval(this.countDown);
+        this.countDown = undefined;
+    }
+
+    async start() {
+        await this.updateStore({
+            running: true,
+            startTime: this.passedTime ? (this.now - this.passedTime) : this.now,
+        });
+
+        this.startCountDown();
+
+        this.update();
+    }
+
+    async pause() {
         await this.updateStore({
             running: false,
             passedTime: this.now - this.startTime,
         });
+
+        this.stopCountDown();
+
         this.update();
     }
 
     async reset() {
-        clearInterval(this.countDown);
+        this.stopCountDown();
         await this.updateStore({
             running: false,
             startTime: 0,
             passedTime: 0,
         });
+
         this.update();
     }
 
     async setType(type) {
-        await this.updateStore({type});
+        this.stopCountDown();
+        await this.updateStore({
+            running: false,
+            startTime: 0,
+            passedTime: 0,
+            type,
+        });
+
         this.update();
     }
 

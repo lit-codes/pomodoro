@@ -58,8 +58,7 @@ class App extends preact.Component {
     }
 
     async onTypeChange(type) {
-        await this.timer.setType(type);
-        this.reset();
+        this.timer.setType(type);
     }
 
     async start() {
