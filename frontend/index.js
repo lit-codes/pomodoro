@@ -38,14 +38,15 @@ class App extends preact.Component {
         this.timer.onUpdate = this.onTimerUpdate.bind(this);
         this.timer.onReach = this.onTimerReach.bind(this);
 
-        this.forceUpdate();
-
         setInterval(() => {
-            if (!this.waitBeforeSendUpdate--) {
-                this.liveStore.requestUpdate('tick', { seconds: this.timer.seconds });
-                this.waitBeforeSendUpdate = 5;
-            }
-        }, 1000);
+            this.liveStore.requestUpdate('tick', {
+                startTime: this.timer.startTime,
+                type: this.timer.type,
+                running: this.timer.running,
+            });
+        }, 10000);
+
+        this.forceUpdate();
     }
 
     onTabSwitch() {
@@ -53,26 +54,25 @@ class App extends preact.Component {
         this.liveStore.reload();
     }
 
-    onStoreUpdate(action, {seconds, type, running}) {
+    onStoreUpdate(action, {startTime, type, running}) {
         switch(action) {
             case 'start':
-                this.timer.start();
+                this.timer.setStartTime(startTime);
+                this.timer.setRunning(true);
                 return this.forceUpdate();
             case 'pause':
-                this.timer.pause();
+                this.timer.setRunning(false);
                 return this.forceUpdate();
             case 'reset':
                 this.timer.reset();
                 return this.forceUpdate();
-            case 'tick' :
-                this.timer.setSeconds(seconds);
-                return this.forceUpdate();
             case 'type' :
                 this.timer.setType(type);
                 return this.forceUpdate();
+            case 'tick':
             case 'reload':
                 if (type) this.timer.setType(type);
-                if (seconds) this.timer.setSeconds(seconds);
+                if (startTime) this.timer.setStartTime(startTime);
                 if (running !== 'undefined') this.timer.setRunning(running);
                 return this.forceUpdate();
         }
@@ -93,18 +93,18 @@ class App extends preact.Component {
 
     onTypeChange(type) {
         this.timer.setType(type);
-        this.liveStore.requestUpdate('type', { type, running: false, seconds: this.timer.seconds });
+        this.liveStore.requestUpdate('type', { type, running: false });
         this.forceUpdate();
     }
 
     start() {
-        this.timer.start();
-        this.liveStore.requestUpdate('start', {running: true});
+        this.timer.setRunning(true);
+        this.liveStore.requestUpdate('start', {running: true, startTime: this.timer.startTime});
         this.forceUpdate();
     }
 
     pause() {
-        this.timer.pause();
+        this.timer.setRunning(false);
         this.liveStore.requestUpdate('pause', {running: false});
         this.forceUpdate();
     }

@@ -24,11 +24,13 @@ class LiveStore {
     async requestUpdate(action, change) {
         const { topic, id } = this;
 
-        const currentStore = await this.get(this.topic);
-        const store = {...currentStore, ...change};
-        await this.saveToStore(store);
+        const timestamp = new Date().getTime();
 
-        return this.post('/send', { topic, message: { topic, id, action, store } });
+        const store = {...change, timestamp};
+
+        this.saveToStore(store);
+
+        return this.post('/send', { topic, message: { topic, id, action, store, timestamp } });
     }
 
     async sendNotification(notification) {
@@ -59,20 +61,23 @@ class LiveStore {
     }
 
     handlePushMessage() {
-        this.messaging.onMessage(({ data }) => {
+        this.messaging.onMessage(async ({ data }) => {
             if (!data) return;
-            const { topic, id, action, store } = JSON.parse(data.message);
-            console.log('update arrived', topic, id, action, store);
+            const { topic, id, action, store: change, timestamp } = JSON.parse(data.message);
             if (id === this.id) return;
+            const currentStore = await this.get(this.topic);
+            if (currentStore.timestamp > change.timestamp) return;
+            const store = {...currentStore, ...change};
+        
             this.saveToStore(store);
             this.emitOnStoreUpdate(action, store);
         });
     }
 
-    saveToStore(store) {
+    async saveToStore(store) {
         const {topic} = this;
 
-        idbKeyval.set(topic, store);
+        return idbKeyval.set(topic, store);
     }
 
     emitOnStoreUpdate(action, store) {
