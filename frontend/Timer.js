@@ -11,48 +11,58 @@ class Timer {
     }
 
     setStartTime(startTime) {
-        if (startTime === this.startTime) return;
-        if (this.startTime !== 0 && startTime !== 0) return;
-        this.startTime = startTime || this.now;
-        this.update();
+        this.startTime = startTime;
     }
 
-    start() {
-        this.setStartTime();
-        this.running = true;
-        this.countDown = setInterval(() => {
-            this.update();
-            if (this.seconds === 0) {
-                this.reach();
-                this.reset();
-            }
-        }, 1000);
+    setPassedTime(passedTime) {
+        this.passedTime = passedTime;
     }
-
-    pause() {
-        this.running = false;
-        clearInterval(this.countDown);
-    }
-
 
     setType(type) {
         this.type = type;
-        this.reset();
     }
 
     setRunning(running) {
         if (!!this.running === !!running) return;
 
         if (this.running) {
-            this.stop();
+            this.pause();
         } else {
             this.start();
         }
     }
 
+    start() {
+        if (this.running) return;
+        if (this.passedTime) {
+            this.setStartTime(this.now - this.passedTime)
+        } else {
+            this.setStartTime(this.now);
+        }
+        this.running = true;
+        this.countDown = setInterval(() => {
+            if (this.seconds === 0) {
+                this.reach();
+                this.reset();
+            }
+            this.update();
+        }, 1000);
+    }
+
+    pause() {
+        if (!this.running) return;
+        this.running = false;
+        this.passedTime = this.now - this.startTime;
+        clearInterval(this.countDown);
+        this.update();
+    }
+
     reset() {
-        this.pause();
+        clearInterval(this.countDown);
+        this.running = false;
         this.startTime = 0;
+        this.passedTime = 0;
+        this.update();
     }
 
     update() {
@@ -82,9 +92,11 @@ class Timer {
 
     get seconds() {
         const oneCycleInSeconds = this.typeToSeconds[this.type];
-        if (this.startTime === 0) return oneCycleInSeconds;
-
-        return oneCycleInSeconds - (this.now - this.startTime);
+        if (this.running) {
+            return oneCycleInSeconds - (this.now - this.startTime);
+        } else {
+            return oneCycleInSeconds - (this.passedTime || 0);
+        }
     }
 }
 

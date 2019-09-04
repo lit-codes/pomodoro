@@ -38,15 +38,18 @@ class App extends preact.Component {
         this.timer.onUpdate = this.onTimerUpdate.bind(this);
         this.timer.onReach = this.onTimerReach.bind(this);
 
-        setInterval(() => {
-            this.liveStore.requestUpdate('tick', {
-                startTime: this.timer.startTime,
-                type: this.timer.type,
-                running: this.timer.running,
-            });
-        }, 10000);
+        setInterval(this.sendUpdate.bind(this), 10000);
 
         this.forceUpdate();
+    }
+
+    sendUpdate() {
+        this.liveStore.requestUpdate('tick', {
+            startTime: this.timer.startTime,
+            passedTime: this.timer.passedTime,
+            type: this.timer.type,
+            running: this.timer.running,
+        });
     }
 
     onTabSwitch() {
@@ -54,31 +57,20 @@ class App extends preact.Component {
         this.liveStore.reload();
     }
 
-    onStoreUpdate(action, {startTime, type, running}) {
-        switch(action) {
-            case 'start':
-                this.timer.setStartTime(startTime);
-                this.timer.setRunning(true);
-                return this.forceUpdate();
-            case 'pause':
-                this.timer.setRunning(false);
-                return this.forceUpdate();
-            case 'reset':
-                this.timer.reset();
-                return this.forceUpdate();
-            case 'type' :
-                this.timer.setType(type);
-                return this.forceUpdate();
-            case 'tick':
-            case 'reload':
-                if (type) this.timer.setType(type);
-                if (startTime) this.timer.setStartTime(startTime);
-                if (running !== 'undefined') this.timer.setRunning(running);
-                return this.forceUpdate();
-        }
+    onStoreUpdate(action, {startTime, type, running, passedTime}) {
+        if (type !== undefined) this.timer.setType(type);
+
+        if (passedTime !== undefined) this.timer.setPassedTime(passedTime);
+
+        if (startTime !== undefined) this.timer.setStartTime(startTime);
+
+        if (running !== undefined) this.timer.setRunning(running);
+
+        return this.forceUpdate();
     }
 
     onTimerUpdate() {
+        this.sendUpdate();
         // render
         this.forceUpdate();
     }
@@ -93,26 +85,19 @@ class App extends preact.Component {
 
     onTypeChange(type) {
         this.timer.setType(type);
-        this.liveStore.requestUpdate('type', { type, running: false });
-        this.forceUpdate();
+        this.reset();
     }
 
     start() {
-        this.timer.setRunning(true);
-        this.liveStore.requestUpdate('start', {running: true, startTime: this.timer.startTime});
-        this.forceUpdate();
+        this.timer.start();
     }
 
     pause() {
-        this.timer.setRunning(false);
-        this.liveStore.requestUpdate('pause', {running: false});
-        this.forceUpdate();
+        this.timer.pause();
     }
 
     reset() {
         this.timer.reset();
-        this.liveStore.requestUpdate('reset', {running: false});
-        this.forceUpdate();
     }
 
     render() {
