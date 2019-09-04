@@ -2,35 +2,58 @@
 <html>
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-147073925-1"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-    <style>
-        button, input {
-            margin-right: 2px;
-            margin-left: 2px;
-        }
-    </style>
+        gtag('config', 'UA-147073925-1');
+	</script>
+    <!-- End of gtag -->
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js">
+	</script>
+
+	<style>
+		button,
+		input {
+			margin-right: 2px;
+			margin-left: 2px;
+		}
+	</style>
 </head>
 
 <body>
-    <div id="app"></div>
+	<div id="app"></div>
 
-    <script src="https://www.gstatic.com/firebasejs/6.4.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/6.4.1/firebase-messaging.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/idb-keyval@3/dist/idb-keyval-iife.min.js"></script>
-    <script src="https://unpkg.com/htm"></script>
-    <script src="https://unpkg.com/preact"></script>
+	<script src="https://www.gstatic.com/firebasejs/6.4.2/firebase-app.js">
+	</script>
+	<script src="https://www.gstatic.com/firebasejs/6.4.1/firebase-messaging.js">
+	</script>
+	<script src="https://cdn.jsdelivr.net/npm/idb-keyval@3/dist/idb-keyval-iife.min.js">
+	</script>
+	<script src="https://unpkg.com/htm">
+	</script>
+	<script src="https://unpkg.com/preact">
+	</script>
 
-    <script>
-        window.html = htm.bind(preact.h);
-    </script>
-    <script src="./frontend/LiveStore.js"></script>
-    <script src="./frontend/Timer.js"></script>
-    <script src="./frontend/Components/TimeDisplay.js"></script>
-    <script src="./frontend/Components/TypeSelector.js"></script>
-    <script src="./frontend/index.js"></script>
+	<script>
+		window.html = htm.bind(preact.h);
+	</script>
+	<script src="./frontend/LiveStore.js">
+	</script>
+	<script src="./frontend/Timer.js">
+	</script>
+	<script src="./frontend/Components/TimeDisplay.js">
+	</script>
+	<script src="./frontend/Components/TypeSelector.js">
+	</script>
+	<script src="./frontend/index.js">
+	</script>
 </body>
 
 </html>
