@@ -22,10 +22,13 @@ class Timer {
     }
 
     async start() {
-        this.updateStore({
-            running: true,
-            startTime: this.passedTime ? (this.now - this.passedTime) : this.now,
-        });
+        if (!this.running) {
+            this.updateStore({
+                running: true,
+                startTime: this.passedTime ? (this.now - this.passedTime) : this.now,
+            });
+        }
+
         this.countDown = setInterval(() => {
             if (this.seconds === 0) {
                 this.reach();
@@ -39,7 +42,7 @@ class Timer {
         clearInterval(this.countDown);
         await this.updateStore({
             running: false,
-            passedTime: this.now - (this.startTime || 0),
+            passedTime: this.now - this.startTime,
         });
         this.update();
     }
@@ -93,7 +96,7 @@ class Timer {
         if (this.running) {
             return oneCycleInSeconds - (this.now - this.startTime);
         } else {
-            return oneCycleInSeconds - (this.passedTime || 0);
+            return oneCycleInSeconds - this.passedTime;
         }
     }
 
