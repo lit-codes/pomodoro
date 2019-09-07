@@ -3,7 +3,7 @@ class Timer {
         this.liveStore = liveStore;
         this.typeToSeconds = {
             'pomodoro-type': 25 * 60,
-            'short-break-type': 5,
+            'short-break-type': 5 * 60,
             'long-break-type': 10 * 60,
         };
         this.liveStore.onStoreUpdate = this.onStoreUpdate.bind(this);
@@ -123,6 +123,7 @@ class Timer {
 
     get seconds() {
         const oneCycleInSeconds = this.typeToSeconds[this.type];
+
         let result;
         if (this.running) {
             result = oneCycleInSeconds - (this.now - this.startTime);

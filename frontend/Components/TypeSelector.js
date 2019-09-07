@@ -27,6 +27,9 @@ class TypeSelector extends preact.Component {
                 />
                 <span>Long break</span>
             </label>
+            <button class="waves-effect waves-light btn-small">
+                <i class="material-icons">edit</i>
+            </button>
         </div>`;
     }
 };
