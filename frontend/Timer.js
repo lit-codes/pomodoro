@@ -3,7 +3,7 @@ class Timer {
         this.liveStore = liveStore;
         this.typeToSeconds = {
             'pomodoro-type': 25 * 60,
-            'short-break-type': 5 * 60,
+            'short-break-type': 5,
             'long-break-type': 10 * 60,
         };
         this.liveStore.onStoreUpdate = this.onStoreUpdate.bind(this);
@@ -11,6 +11,7 @@ class Timer {
 
     onStoreUpdate(oldStore, newStore) {
         if (!!oldStore.running === !!newStore.running) return this.update();
+        if (this.isReached()) return this.update();
 
         if (newStore.running) {
             this.startCountDown();
@@ -25,12 +26,18 @@ class Timer {
         if (this.countDown) return;
 
         this.countDown = setInterval(() => {
-            if (this.seconds <= 0) {
-                this.reach();
-                this.reset();
-            }
+            this.isReached();
             this.update();
         }, 1000);
+    }
+    
+    isReached() {
+        if (this.seconds > 0) return false;
+
+        this.reach();
+        this.reset();
+
+        return true;
     }
 
     stopCountDown() {
@@ -116,11 +123,14 @@ class Timer {
 
     get seconds() {
         const oneCycleInSeconds = this.typeToSeconds[this.type];
+        let result;
         if (this.running) {
-            return oneCycleInSeconds - (this.now - this.startTime);
+            result = oneCycleInSeconds - (this.now - this.startTime);
         } else {
-            return oneCycleInSeconds - this.passedTime;
+            result = oneCycleInSeconds - this.passedTime;
         }
+
+        return result >= 0 && result <= oneCycleInSeconds ? result : 0;
     }
 
     get store() {

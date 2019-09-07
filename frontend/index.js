@@ -40,7 +40,10 @@ class App extends preact.Component {
         this.reset = this.timer.reset.bind(this.timer);
         this.onTypeChange = this.timer.setType.bind(this.timer);
 
-        this.forceUpdate();
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) return;
+            this.liveStore.reload();
+        });
     }
 
     render() {

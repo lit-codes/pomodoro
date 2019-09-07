@@ -15,8 +15,9 @@ class LiveStore {
 
     async reload() {
         const oldStore = this.store;
-        const store = await this.get(this.topic);
-        this.emitOnStoreUpdate(oldStore, store);
+        const newStore = await this.get(this.topic);
+        if (oldStore.timestamp >= newStore.timestamp) return;
+        this.emitOnStoreUpdate(oldStore, newStore);
     }
 
     async get() {
