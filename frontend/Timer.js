@@ -90,9 +90,11 @@ class Timer {
     }
 
     reach() {
-        if (typeof this.onReach === 'function') {
-            this.onReach();
-        }
+        this.liveStore.sendNotification({
+            title: 'Pomodoro',
+            body: 'Time is up!',
+            clickAction: document.location.toString(),
+        });
     }
 
     async updateStore(change) {

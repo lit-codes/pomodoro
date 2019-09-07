@@ -31,43 +31,21 @@ class App extends preact.Component {
         this.liveStore.init();
         this.timer = new Timer(this.liveStore);
 
-        this.timer.onUpdate = this.onTimerUpdate.bind(this);
-        this.timer.onReach = this.onTimerReach.bind(this);
+        // Rerender on timer update
+        this.timer.onUpdate = () => this.forceUpdate();
+
+        // Bind actions
+        this.start = this.timer.start.bind(this.timer);
+        this.pause = this.timer.pause.bind(this.timer);
+        this.reset = this.timer.reset.bind(this.timer);
+        this.onTypeChange = this.timer.setType.bind(this.timer);
 
         this.forceUpdate();
-    }
-
-    onTimerUpdate() {
-        // render
-        this.forceUpdate();
-    }
-
-    onTimerReach() {
-        this.liveStore.sendNotification({
-            title: 'Pomodoro',
-            body: 'Time is up!',
-            clickAction: document.location.toString(),
-        });
-    }
-
-    async onTypeChange(type) {
-        this.timer.setType(type);
-    }
-
-    async start() {
-        this.timer.start();
-    }
-
-    async pause() {
-        this.timer.pause();
-    }
-
-    async reset() {
-        this.timer.reset();
     }
 
     render() {
         if (!this.timer) return html`<div>Loading...<//>`;
+
         return html`<div class="container">
             <div class="row center-align">
                 <h1>
@@ -75,26 +53,26 @@ class App extends preact.Component {
                 </h1>
             </div>
             <div class="row center-align">
-                <${TypeSelector} onTypeChange=${this.onTypeChange.bind(this)} type=${this.timer.type} />
+                <${TypeSelector} onTypeChange=${this.onTypeChange} type=${this.timer.type} />
             </div>
             <div class="row center-align">
                 <button
                     class="waves-effect waves-light btn-small"
-                    onClick=${this.start.bind(this)}
+                    onClick=${this.start}
                     disabled=${this.timer.running}
                 >
                     Start
                 </button>
                 <button
                     class="waves-effect waves-light btn-small"
-                    onClick=${this.pause.bind(this)}
+                    onClick=${this.pause}
                     disabled=${!this.timer.running}
                 >
                     Pause
                 </button>
                 <button
                     class="waves-effect waves-light btn-small"
-                    onClick=${this.reset.bind(this)}
+                    onClick=${this.reset}
                 >
                     Reset
                 </button>
