@@ -9,12 +9,12 @@ Your favorite time tracking technique, available for web, which you can start/st
 
 ## Usage
 
-```
-https://pomodoro.lit.codes/#3xJ0
-```
+[https://pomodoro.lit.codes/](https://pomodoro.lit.codes/)`#s43er`
 
-Use the above code to connect to your pomodoro timer, it automatically synchronizes with all your
-devices that use the same code, no registration required.
+If you click on the link above, a code will be autocreated for you, which can be used to synchronize
+the timer between your devices.
+
+You can also use any custom code that makes it easier to remember/reuse your session (e.g. `#my-custom-code`).
 
 ## Scan a QR code to open the timer on another device
 
