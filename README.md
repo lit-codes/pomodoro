@@ -3,7 +3,7 @@
 Your favorite time tracking technique, available for web, which you can start/stop/configure on one device and have it automatically updated on other devices.
 
 - No login is required
-- There is no server, the moment you close the tabs the timer stops
+- It's serverless, the moment you close the tabs the timer stops
 - A notification permission is required for syncing and alerts
 - Powered by [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)
 
