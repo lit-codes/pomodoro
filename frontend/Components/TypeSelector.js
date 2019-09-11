@@ -1,35 +1,54 @@
 class TypeSelector extends preact.Component {
+    state = {
+        currentlyEditing: undefined,
+        pomodoro  : '25:00',
+        shortBreak: '05:00',
+        longBreak : '10:00',
+    };
+
     changeType(type) {
         return () => {
             this.props.onTypeChange(type);
         };
     }
+
+    setType(type) {
+        this.setState({ currentlyEditing: undefined });
+    }
+
+    editType(type) {
+        if (this.props.type === type) return false;
+
+        this.setState({ isEditing: type });
+    }
+
+    onInput(type) {
+        return e => {
+            this.setState({[type]: toTime(e.target.value)});
+        };
+    }
+
     render() {
         return html`<div>
-            <label for="pomodoro-type">
-                <input type="radio" id="pomodoro-type" name="timer-type"
-                    checked=${this.props.type === 'pomodoro-type' ? true : false}
-                    onClick=${this.changeType('pomodoro-type')}
-                />
-                <span>Pomodoro</span>
-            </label>
-            <label for="short-break-type">
-                <input type="radio" id="short-break-type" name="timer-type"
-                    checked=${this.props.type === 'short-break-type' ? true : false}
-                    onClick=${this.changeType('short-break-type')}
-                />
-                <span>Short break</span>
-            </label>
-            <label for="long-break-type">
-                <input type="radio" id="long-break-type" name="timer-type"
-                    checked=${this.props.type === 'long-break-type' ? true : false}
-                    onClick=${this.changeType('long-break-type')}
-                />
-                <span>Long break</span>
-            </label>
-            <button class="waves-effect waves-light btn-small">
-                <i class="material-icons">edit</i>
-            </button>
+            ${
+                this.state.isEditing === 'pomodoro'
+                ? html`<input
+                    value="25"
+                    type="text"
+                    onChange=${this.onInput('pomodoro')}>
+                </input>:<input
+                    value="00"
+                    type="text"
+                    onChange=${this.onInput('pomodoro')}>
+                </input>`
+                : html`<label for="pomodoro" onClick=${this.editType('pomodoro')}>
+                    <input type="radio" id="pomodoro" name="timer"
+                        checked=${this.props.type === 'pomodoro' ? true : false}
+                        onClick=${this.changeType('pomodoro')}
+                    />
+                    <span>Pomodoro</span>
+                </label>`
+            }
         </div>`;
     }
 };
