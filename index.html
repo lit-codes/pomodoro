@@ -15,8 +15,8 @@
     <!-- End of gtag -->
 
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js">
-	</script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
 	<style>
 		button,
@@ -24,6 +24,33 @@
 			margin-right: 2px;
 			margin-left: 2px;
 		}
+
+        .minute-second {
+            width: 2em !important;
+            text-align: center;
+            -moz-appearance: textfield;
+        }
+
+        .minute-second::-webkit-outer-spin-button,
+        .minute-second::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #type-selector {
+            min-height: 4em;
+        }
+
+        [type="radio"]+span:before,
+        [type="radio"]+span:after {
+            top: 1rem;
+            left: 1rem;
+        }
+
 	</style>
 </head>
 
@@ -51,6 +78,8 @@
 	<script src="./frontend/Components/TimeDisplay.js">
 	</script>
 	<script src="./frontend/Components/TypeSelector.js">
+	</script>
+    <script src="./frontend/Components/MinuteSecond.js">
 	</script>
 	<script src="./frontend/index.js">
 	</script>

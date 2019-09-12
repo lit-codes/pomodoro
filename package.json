@@ -4,7 +4,7 @@
   "description": "",
   "main": "get_token.js",
   "scripts": {
-    "start": "PKEY=\"$(cat pkey)\" node api/index.js"
+    "start": "PKEY=\"-----BEGIN PRIVATE KEY-----\\n$PKEY==\\n-----END PRIVATE KEY-----\\n\" node api/index.js"
   },
   "author": "",
   "license": "ISC",

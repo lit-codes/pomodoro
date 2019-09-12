@@ -39,6 +39,8 @@ class App extends preact.Component {
         this.pause = this.timer.pause.bind(this.timer);
         this.reset = this.timer.reset.bind(this.timer);
         this.onTypeChange = this.timer.setType.bind(this.timer);
+        this.onTimeChange = this.timer.setTypeToSeconds.bind(this.timer);
+        this.onResetTypes = this.timer.resetTypeToSeconds.bind(this.timer);
 
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) return;
@@ -47,38 +49,48 @@ class App extends preact.Component {
     }
 
     render() {
-        if (!this.timer) return html`<div>Loading...<//>`;
+        if (!this.timer) return html`<div class="progress">
+            <div class="indeterminate"></div>
+        </div>`;
 
         return html`<div class="container">
-            <div class="row center-align">
-                <h1>
+            <div class="row">
+                <h1 class="center-align">
                     <${TimeDisplay} time=${this.timer.display}/>
                 </h1>
             </div>
-            <div class="row center-align">
-                <${TypeSelector} onTypeChange=${this.onTypeChange} type=${this.timer.type} />
+            <div id="type-selector" class="row valign-center">
+                <${TypeSelector}
+                    onTypeChange=${this.onTypeChange}
+                    onTimeChange=${this.onTimeChange}
+                    onResetTypes=${this.onResetTypes}
+                    type=${this.timer.type}
+                    typeToSeconds=${this.timer.typeToSeconds}
+                />
             </div>
-            <div class="row center-align">
-                <button
-                    class="waves-effect waves-light btn-small"
-                    onClick=${this.start}
-                    disabled=${this.timer.running}
-                >
-                    Start
-                </button>
-                <button
-                    class="waves-effect waves-light btn-small"
-                    onClick=${this.pause}
-                    disabled=${!this.timer.running}
-                >
-                    Pause
-                </button>
-                <button
-                    class="waves-effect waves-light btn-small"
-                    onClick=${this.reset}
-                >
-                    Reset
-                </button>
+            <div class="row">
+                <div class="center-align">
+                    <button
+                        class="waves-effect waves-light btn-small"
+                        onClick=${this.start}
+                        disabled=${this.timer.running}
+                    >
+                        Start
+                    </button>
+                    <button
+                        class="waves-effect waves-light btn-small"
+                        onClick=${this.pause}
+                        disabled=${!this.timer.running}
+                    >
+                        Pause
+                    </button>
+                    <button
+                        class="waves-effect waves-light btn-small"
+                        onClick=${this.reset}
+                    >
+                        Reset
+                    </button>
+                </div>
             </div>
             <div class="row center-align">
                 <img src="https://chart.googleapis.com/chart?cht=qr&chs=177x177&chld=H&chl=${document.location.toString().replace('#', '%23')}" />
