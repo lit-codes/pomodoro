@@ -1,11 +1,6 @@
 class Timer {
     constructor(liveStore) {
         this.liveStore = liveStore;
-        this.typeToSeconds = {
-            'pomodoro-type': 25 * 60,
-            'short-break-type': 5 * 60,
-            'long-break-type': 10 * 60,
-        };
         this.liveStore.onStoreUpdate = this.onStoreUpdate.bind(this);
     }
 
@@ -30,7 +25,7 @@ class Timer {
             this.update();
         }, 1000);
     }
-    
+
     isReached() {
         if (this.seconds > 0) return false;
 
@@ -85,6 +80,29 @@ class Timer {
             startTime: 0,
             passedTime: 0,
             type,
+        });
+
+        this.update();
+    }
+
+    async setTypeToSeconds(type, seconds) {
+        await this.updateStore({
+            typeToSeconds: {
+                ...this.typeToSeconds,
+                [type]: seconds,
+            }
+        });
+
+        this.update();
+    }
+
+    async resetTypeToSeconds() {
+        await this.updateStore({
+            typeToSeconds: {
+                'pomodoro': 25 * 60,
+                'short-break': 5 * 60,
+                'long-break': 10 * 60,
+            }
         });
 
         this.update();
@@ -147,12 +165,18 @@ class Timer {
     }
 
     get type() {
-        return this.liveStore.store.type || 'pomodoro-type';
+        return this.liveStore.store.type || 'pomodoro';
     }
 
     get running() {
         return this.liveStore.store.running || false;
     }
-}
 
-window.Timer = Timer;
+    get typeToSeconds() {
+        return this.liveStore.store.typeToSeconds || {
+            'pomodoro': 25 * 60,
+            'short-break': 5 * 60,
+            'long-break': 10 * 60,
+        };
+    }
+}

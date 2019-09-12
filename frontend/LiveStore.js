@@ -104,5 +104,3 @@ class LiveStore {
         });
     }
 }
-
-globalThis.LiveStore = LiveStore;
