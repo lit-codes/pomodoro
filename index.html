@@ -31,6 +31,14 @@
             -moz-appearance: textfield;
         }
 
+        .minute-second-disabled,
+        .minute-second-disabled:focus {
+            width: 4em !important;
+            text-align: center;
+            background: none;
+            border: none;
+        }
+
         .minute-second::-webkit-outer-spin-button,
         .minute-second::-webkit-inner-spin-button {
             -webkit-appearance: none;
@@ -77,9 +85,11 @@
 	</script>
 	<script src="./frontend/Components/TimeDisplay.js">
 	</script>
-	<script src="./frontend/Components/TypeSelector.js">
-	</script>
     <script src="./frontend/Components/MinuteSecond.js">
+	</script>
+	<script src="./frontend/Components/Type.js">
+	</script>
+	<script src="./frontend/Components/TypeSelector.js">
 	</script>
 	<script src="./frontend/index.js">
 	</script>

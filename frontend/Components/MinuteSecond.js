@@ -1,4 +1,12 @@
 class MinuteSecond extends preact.Component {
+    minutesRef = preact.createRef();
+
+    componentDidMount() {
+        setTimeout(() => {
+            this.minutesRef.current.focus();
+        }, 0);
+    }
+
     get minutes() {
         return padWithZero(parseInt(this.props.time / 60, 10));
     }
@@ -30,6 +38,7 @@ class MinuteSecond extends preact.Component {
                 max="59"
                 step="01"
                 type="number"
+                ref=${this.minutesRef}
                 onInput=${this.onInput('minutes')}
             />
             <span style="font-size:1.2em">:</span>
